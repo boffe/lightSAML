@@ -11,12 +11,12 @@
 
 namespace LightSaml\Store\Request;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestStateSessionStore extends AbstractRequestStateArrayStore
 {
-    /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface */
-    protected $session;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var string */
     protected $providerId;
@@ -25,13 +25,13 @@ class RequestStateSessionStore extends AbstractRequestStateArrayStore
     protected $prefix;
 
     /**
-     * @param SessionInterface $session
-     * @param string           $providerId
-     * @param string           $prefix
+     * @param RequestStack $requestStack
+     * @param string       $providerId
+     * @param string       $prefix
      */
-    public function __construct(SessionInterface $session, $providerId, $prefix = 'saml_request_state_')
+    public function __construct(RequestStack $requestStack, $providerId, $prefix = 'saml_request_state_')
     {
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->providerId = $providerId;
         $this->prefix = $prefix;
     }
@@ -49,7 +49,7 @@ class RequestStateSessionStore extends AbstractRequestStateArrayStore
      */
     protected function getArray()
     {
-        return $this->session->get($this->getKey(), array());
+        return $this->requestStack->getSession()->get($this->getKey(), array());
     }
 
     /**
@@ -59,6 +59,6 @@ class RequestStateSessionStore extends AbstractRequestStateArrayStore
      */
     protected function setArray(array $arr)
     {
-        $this->session->set($this->getKey(), $arr);
+        $this->requestStack->getSession()->set($this->getKey(), $arr);
     }
 }
